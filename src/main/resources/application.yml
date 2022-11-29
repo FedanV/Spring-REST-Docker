@@ -1,0 +1,21 @@
+spring:
+  datasource:
+    url: jdbc:postgresql://localhost:5435/postgres
+    username: postgres
+    password: pass
+    driver-class-name: org.postgresql.Driver
+  jpa:
+    properties:
+      hibernate:
+        hbm2ddl:
+          auto: validate
+        format_sql: true
+        show_sql: true
+    open-in-view: false
+logging:
+  level:
+    root: INFO
+    org.vitalii.carrestservice: INFO
+  file:
+    name: carService.log
+
