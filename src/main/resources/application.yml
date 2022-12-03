@@ -1,0 +1,33 @@
+spring:
+  datasource:
+    url: jdbc:postgresql://localhost:5435/postgres
+    username: postgres
+    password: pass
+    driver-class-name: org.postgresql.Driver
+  jpa:
+    properties:
+      hibernate:
+        hbm2ddl:
+          auto: validate
+        format_sql: true
+        show_sql: true
+    open-in-view: false
+  security:
+    oauth2:
+        resourceserver:
+          jwt:
+            issuer-uri: https://${auth0.domain}/
+
+logging:
+  level:
+    root: INFO
+    org.vitalii.carrestservice: INFO
+  file:
+    name: carService.log
+server:
+  port: 7000
+auth0:
+  audience: https://car-api.com
+  domain: dev-vcfwyiecn07atwpq.eu.auth0.com
+
+
