@@ -19,7 +19,7 @@ import javax.validation.Valid;
 @RestController
 @RequestMapping("/api/v1/manufacturers/models/years/categories")
 @RequiredArgsConstructor
-public class CategoryController {
+public class CategoryController implements SecuredRestController {
 
     private final CategoryService categoryService;
     private final CategoryCreateEditDtoValidator categoryCreateEditDtoValidator;

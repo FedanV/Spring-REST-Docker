@@ -19,7 +19,7 @@ import javax.validation.Valid;
 @RestController
 @RequestMapping("/api/v1/cars")
 @RequiredArgsConstructor
-public class CarController {
+public class CarController implements SecuredRestController {
 
     private final CarService carService;
     private final CarCreateEditDtoValidator carCreateEditDtoValidator;

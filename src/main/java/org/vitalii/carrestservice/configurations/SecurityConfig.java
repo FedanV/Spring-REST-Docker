@@ -1,6 +1,5 @@
 package org.vitalii.carrestservice.configurations;
 
-
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.http.HttpMethod;
@@ -14,6 +13,14 @@ import org.springframework.security.web.SecurityFilterChain;
 @EnableWebSecurity
 public class SecurityConfig {
 
+    private static final String[] AUTH_WHITELIST = {
+            "/authenticate",
+            "/swagger-resources/**",
+            "/swagger-ui/**",
+            "/v3/api-docs/**",
+            "/webjars/**"
+    };
+
     @Value("${auth0.audience}")
     private String audience;
 
@@ -25,6 +32,7 @@ public class SecurityConfig {
         http
                 .csrf().disable()
                 .authorizeHttpRequests(urlConfig -> urlConfig
+                        .antMatchers(AUTH_WHITELIST).permitAll()
                         .antMatchers(HttpMethod.GET, "/api/v1/**").permitAll()
                         .anyRequest().authenticated()
                 )
