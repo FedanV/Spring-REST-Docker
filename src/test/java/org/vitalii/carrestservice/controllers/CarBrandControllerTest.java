@@ -4,15 +4,16 @@ import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 import org.skyscreamer.jsonassert.JSONAssert;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.autoconfigure.security.servlet.SecurityAutoConfiguration;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.boot.test.mock.mockito.SpyBean;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.mapping.PropertyReferenceException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
+import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.test.web.servlet.request.MockHttpServletRequestBuilder;
@@ -31,7 +32,8 @@ import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-@WebMvcTest(controllers = CarBrandController.class, excludeAutoConfiguration = {SecurityAutoConfiguration.class})
+@WebMvcTest(controllers = CarBrandController.class)
+@ActiveProfiles("noauth")
 class CarBrandControllerTest {
     @Autowired
     private MockMvc mockMvc;
@@ -56,6 +58,16 @@ class CarBrandControllerTest {
                 "\"metadata\":{\"page\":0,\"size\":2,\"totalElements\":2}}";
         JSONAssert.assertEquals(expected, result.getResponse().getContentAsString(), false);
     }
+    @Test
+    void findAllManufacturesThrowPropertyReferenceException() throws Exception {
+        Mockito.doThrow(PropertyReferenceException.class)
+                .when(carBrandService).findAll(Mockito.any(CarFilter.class), (Mockito.any(Pageable.class)));
+        MockHttpServletRequestBuilder requestBuilder = MockMvcRequestBuilders.get("/api/v1/manufacturers")
+                .accept(MediaType.APPLICATION_JSON);
+        mockMvc.perform(requestBuilder)
+                .andExpect(MockMvcResultMatchers.status().isNotAcceptable());
+    }
+
 
     @Test
     void findManufactureById() throws Exception {
@@ -123,7 +135,6 @@ class CarBrandControllerTest {
         mockMvc.perform(requestBuilder)
                 .andExpect(MockMvcResultMatchers.status().isBadRequest())
                 .andExpect(result -> assertTrue(result.getResolvedException() instanceof BindException));
-
     }
 
 }
