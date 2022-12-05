@@ -21,12 +21,11 @@ import java.util.Map;
 @RestControllerAdvice
 public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
 
-    @ExceptionHandler(PropertyReferenceException.class)
-    public ResponseEntity<Object> handlePropertyReferenceException(PropertyReferenceException ex,
-                                                                     HttpHeaders headers) {
-        String body = String.format("Property %s not found", ex.getPropertyName());
+    @ExceptionHandler({PropertyReferenceException.class})
+    public ResponseEntity<Object> handlePropertyReferenceException(PropertyReferenceException ex) {
+        String body = String.format("Property '%s' not found", ex.getPropertyName());
         log.error(body, ex);
-        return new ResponseEntity<>(body, headers, HttpStatus.NOT_ACCEPTABLE);
+        return new ResponseEntity<>(body, HttpStatus.NOT_ACCEPTABLE);
     }
 
     @Override
