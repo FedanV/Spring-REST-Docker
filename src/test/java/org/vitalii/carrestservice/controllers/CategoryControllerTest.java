@@ -4,20 +4,21 @@ import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 import org.skyscreamer.jsonassert.JSONAssert;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.autoconfigure.security.servlet.SecurityAutoConfiguration;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.boot.test.mock.mockito.SpyBean;
+import org.springframework.context.annotation.Import;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
-import org.springframework.test.context.ActiveProfiles;
+import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.test.web.servlet.request.MockHttpServletRequestBuilder;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
+import org.vitalii.carrestservice.configurations.SecurityConfig;
 import org.vitalii.carrestservice.dto.CategoryCreateEditDto;
 import org.vitalii.carrestservice.dto.CategoryReadDto;
 import org.vitalii.carrestservice.dto.filters.CarFilter;
@@ -30,7 +31,7 @@ import java.util.Optional;
 import static org.junit.jupiter.api.Assertions.*;
 
 @WebMvcTest(controllers = CategoryController.class)
-@ActiveProfiles("noauth")
+@Import(SecurityConfig.class)
 class CategoryControllerTest {
 
     @Autowired
@@ -68,6 +69,7 @@ class CategoryControllerTest {
     }
 
     @Test
+    @WithMockUser
     void createCategory() throws Exception {
         Mockito.doReturn(categoryReadDto1).when(categoryService).save(Mockito.any(CategoryCreateEditDto.class));
         MockHttpServletRequestBuilder requestBuilder = MockMvcRequestBuilders.post("/api/v1/manufacturers/models/years/categories")
@@ -81,6 +83,7 @@ class CategoryControllerTest {
     }
 
     @Test
+    @WithMockUser
     void updateCategory() throws Exception {
         Mockito.doReturn(Optional.of(categoryReadDto1)).when(categoryService).update(Mockito.anyInt(), Mockito.any(CategoryCreateEditDto.class));
         MockHttpServletRequestBuilder requestBuilder = MockMvcRequestBuilders.put("/api/v1/manufacturers/models/years/categories/1")
@@ -93,6 +96,7 @@ class CategoryControllerTest {
     }
 
     @Test
+    @WithMockUser
     void deleteCategory() throws Exception {
         Mockito.doReturn(true).when(categoryService).deleteById(Mockito.anyInt());
         mockMvc.perform(MockMvcRequestBuilders.delete("/api/v1/manufacturers/models/years/categories/1"))
@@ -100,6 +104,7 @@ class CategoryControllerTest {
     }
 
     @Test
+    @WithMockUser
     void deleteCategoryThrowNotFoundStatus() throws Exception {
         Mockito.doReturn(false).when(categoryService).deleteById(Mockito.anyInt());
         mockMvc.perform(MockMvcRequestBuilders.delete("/api/v1/manufacturers/models/years/categories/1"))

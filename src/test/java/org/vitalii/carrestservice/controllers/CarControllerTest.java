@@ -7,17 +7,19 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.boot.test.mock.mockito.SpyBean;
+import org.springframework.context.annotation.Import;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
-import org.springframework.test.context.ActiveProfiles;
+import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.test.web.servlet.request.MockHttpServletRequestBuilder;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 import org.springframework.validation.BindException;
+import org.vitalii.carrestservice.configurations.SecurityConfig;
 import org.vitalii.carrestservice.database.entities.CarYear;
 import org.vitalii.carrestservice.dto.*;
 import org.vitalii.carrestservice.dto.filters.CarFilter;
@@ -30,7 +32,7 @@ import java.util.Optional;
 import static org.junit.jupiter.api.Assertions.*;
 
 @WebMvcTest(controllers = CarController.class)
-@ActiveProfiles("noauth")
+@Import(SecurityConfig.class)
 class CarControllerTest {
 
     @Autowired
@@ -85,6 +87,7 @@ class CarControllerTest {
     }
 
     @Test
+    @WithMockUser
     void createCar() throws Exception {
         Mockito.doReturn(carReadDto).when(carService).save(Mockito.any(CarCreateEditDto.class));
         MockHttpServletRequestBuilder requestBuilder = MockMvcRequestBuilders.post("/api/v1/cars")
@@ -100,6 +103,7 @@ class CarControllerTest {
     }
 
     @Test
+    @WithMockUser
     void updateCar() throws Exception {
         Mockito.doReturn(Optional.of(carReadDto)).when(carService).update(Mockito.anyInt(), Mockito.any(CarCreateEditDto.class));
         MockHttpServletRequestBuilder requestBuilder = MockMvcRequestBuilders.put("/api/v1/cars/1")
@@ -114,6 +118,7 @@ class CarControllerTest {
     }
 
     @Test
+    @WithMockUser
     void deleteCar() throws Exception {
         Mockito.doReturn(true).when(carService).deleteById(Mockito.anyInt());
         mockMvc.perform(MockMvcRequestBuilders.delete("/api/v1/cars/1"))
@@ -121,6 +126,7 @@ class CarControllerTest {
     }
 
     @Test
+    @WithMockUser
     void createCarThrowBindException() throws Exception {
         Mockito.doReturn(Optional.of(new CarYear())).when(carYearService).findByYear(Mockito.anyString());
         mockMvc.perform(MockMvcRequestBuilders.post("/api/v1/cars")
