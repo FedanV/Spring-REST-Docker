@@ -54,7 +54,9 @@ class CarBrandControllerTest {
                 .when(carBrandService).findAll(Mockito.any(CarFilter.class), Mockito.any(Pageable.class));
         MockHttpServletRequestBuilder requestBuilder = MockMvcRequestBuilders.get("/api/v1/manufacturers")
                 .accept(MediaType.APPLICATION_JSON);
-        MvcResult result = mockMvc.perform(requestBuilder).andReturn();
+        MvcResult result = mockMvc.perform(requestBuilder)
+                .andExpect(MockMvcResultMatchers.status().isOk())
+                .andReturn();
         String expected = "{\"content\":[{\"id\":1,\"brand\":\"brand1\"},{\"id\":2,\"brand\":\"brand2\"}]," +
                 "\"metadata\":{\"page\":0,\"size\":2,\"totalElements\":2}}";
         JSONAssert.assertEquals(expected, result.getResponse().getContentAsString(), false);
@@ -65,7 +67,9 @@ class CarBrandControllerTest {
         Mockito.doReturn(Optional.of(mockBrandReadDto1)).when(carBrandService).findById(Mockito.anyInt());
         MockHttpServletRequestBuilder requestBuilder = MockMvcRequestBuilders.get("/api/v1/manufacturers/1")
                 .accept(MediaType.APPLICATION_JSON);
-        MvcResult result = mockMvc.perform(requestBuilder).andReturn();
+        MvcResult result = mockMvc.perform(requestBuilder)
+                .andExpect(MockMvcResultMatchers.status().isOk())
+                .andReturn();
         String expected = "{\"id\":1,\"brand\":\"brand1\"}";
         JSONAssert.assertEquals(expected, result.getResponse().getContentAsString(), false);
     }
@@ -78,8 +82,9 @@ class CarBrandControllerTest {
                 .accept(MediaType.APPLICATION_JSON)
                 .content(brandCreateEditJson)
                 .contentType(MediaType.APPLICATION_JSON);
-        MvcResult result = mockMvc.perform(requestBuilder).andReturn();
-        assertEquals(HttpStatus.CREATED.value(), result.getResponse().getStatus());
+        MvcResult result = mockMvc.perform(requestBuilder)
+                .andExpect(MockMvcResultMatchers.status().isCreated())
+                .andReturn();
         String expected = "{\"id\":1,\"brand\":\"brand1\"}";
         JSONAssert.assertEquals(expected, result.getResponse().getContentAsString(), false);
     }
@@ -92,7 +97,9 @@ class CarBrandControllerTest {
                 .accept(MediaType.APPLICATION_JSON)
                 .content(brandCreateEditJson)
                 .contentType(MediaType.APPLICATION_JSON);
-        MvcResult result = mockMvc.perform(requestBuilder).andReturn();
+        MvcResult result = mockMvc.perform(requestBuilder)
+                .andExpect(MockMvcResultMatchers.status().isOk())
+                .andReturn();
         String expected = "{\"id\":1,\"brand\":\"brand1\"}";
         JSONAssert.assertEquals(expected, result.getResponse().getContentAsString(), false);
     }
@@ -102,8 +109,8 @@ class CarBrandControllerTest {
     void deleteManufacture() throws Exception {
         Mockito.doReturn(true).when(carBrandService).deleteById(Mockito.anyInt());
         MockHttpServletRequestBuilder requestBuilder = MockMvcRequestBuilders.delete("/api/v1/manufacturers/1");
-        MvcResult result = mockMvc.perform(requestBuilder).andReturn();
-        assertEquals(HttpStatus.NO_CONTENT.value(), result.getResponse().getStatus());
+        mockMvc.perform(requestBuilder)
+                .andExpect(MockMvcResultMatchers.status().isNoContent());
     }
 
     @Test

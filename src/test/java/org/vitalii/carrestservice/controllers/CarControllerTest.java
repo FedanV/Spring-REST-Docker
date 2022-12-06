@@ -66,7 +66,9 @@ class CarControllerTest {
                 .findAll(Mockito.any(CarFilter.class), Mockito.any(Pageable.class));
         MockHttpServletRequestBuilder requestBuilder = MockMvcRequestBuilders.get("/api/v1/cars")
                 .accept(MediaType.APPLICATION_JSON);
-        MvcResult result = mockMvc.perform(requestBuilder).andReturn();
+        MvcResult result = mockMvc.perform(requestBuilder)
+                .andExpect(MockMvcResultMatchers.status().isOk())
+                .andReturn();
         String excepted = "{\"content\":[{\"id\":1,\"brand\":{\"id\":1,\"brand\":\"brand1\"}," +
                 "\"model\":{\"id\":1,\"model\":\"model1\"},\"year\":{\"id\":1,\"year\":\"1970\"}," +
                 "\"categories\":[{\"id\":1,\"name\":\"category1\"}]}]," +
@@ -79,7 +81,9 @@ class CarControllerTest {
         Mockito.doReturn(Optional.of(carReadDto)).when(carService).findById(Mockito.anyInt());
         MockHttpServletRequestBuilder requestBuilder = MockMvcRequestBuilders.get("/api/v1/cars/1")
                 .accept(MediaType.APPLICATION_JSON);
-        MvcResult result = mockMvc.perform(requestBuilder).andReturn();
+        MvcResult result = mockMvc.perform(requestBuilder)
+                .andExpect(MockMvcResultMatchers.status().isOk())
+                .andReturn();
         String excepted = "{\"id\":1,\"brand\":{\"id\":1,\"brand\":\"brand1\"}," +
                 "\"model\":{\"id\":1,\"model\":\"model1\"},\"year\":{\"id\":1,\"year\":\"1970\"}," +
                 "\"categories\":[{\"id\":1,\"name\":\"category1\"}]}";
@@ -94,11 +98,12 @@ class CarControllerTest {
                 .accept(MediaType.APPLICATION_JSON)
                 .content(carCreateUpdateJson)
                 .contentType(MediaType.APPLICATION_JSON);
-        MvcResult result = mockMvc.perform(requestBuilder).andReturn();
+        MvcResult result = mockMvc.perform(requestBuilder)
+                .andExpect(MockMvcResultMatchers.status().isCreated())
+                .andReturn();
         String excepted = "{\"id\":1,\"brand\":{\"id\":1,\"brand\":\"brand1\"}," +
                 "\"model\":{\"id\":1,\"model\":\"model1\"},\"year\":{\"id\":1,\"year\":\"1970\"}," +
                 "\"categories\":[{\"id\":1,\"name\":\"category1\"}]}";
-        assertEquals(HttpStatus.CREATED.value(), result.getResponse().getStatus());
         JSONAssert.assertEquals(excepted, result.getResponse().getContentAsString(), false);
     }
 
@@ -110,7 +115,9 @@ class CarControllerTest {
                 .accept(MediaType.APPLICATION_JSON)
                 .content(carCreateUpdateJson)
                 .contentType(MediaType.APPLICATION_JSON);
-        MvcResult result = mockMvc.perform(requestBuilder).andReturn();
+        MvcResult result = mockMvc.perform(requestBuilder)
+                .andExpect(MockMvcResultMatchers.status().isOk())
+                .andReturn();
         String excepted = "{\"id\":1,\"brand\":{\"id\":1,\"brand\":\"brand1\"}," +
                 "\"model\":{\"id\":1,\"model\":\"model1\"},\"year\":{\"id\":1,\"year\":\"1970\"}," +
                 "\"categories\":[{\"id\":1,\"name\":\"category1\"}]}";

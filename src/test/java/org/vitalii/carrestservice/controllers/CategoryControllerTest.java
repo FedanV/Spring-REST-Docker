@@ -52,7 +52,9 @@ class CategoryControllerTest {
                 .finAll(Mockito.any(CarFilter.class), Mockito.any(Pageable.class));
         MockHttpServletRequestBuilder requestBuilder = MockMvcRequestBuilders.get("/api/v1/manufacturers/models/years/categories")
                 .accept(MediaType.APPLICATION_JSON);
-        MvcResult result = mockMvc.perform(requestBuilder).andReturn();
+        MvcResult result = mockMvc.perform(requestBuilder)
+                .andExpect(MockMvcResultMatchers.status().isOk())
+                .andReturn();
         String expected = "{\"content\":[{\"id\":1,\"name\":\"category1\"},{\"id\":2,\"name\":\"category1\"}]," +
                 "\"metadata\":{\"page\":0,\"size\":2,\"totalElements\":2}}";
         JSONAssert.assertEquals(expected, result.getResponse().getContentAsString(), false);
@@ -63,7 +65,9 @@ class CategoryControllerTest {
         Mockito.doReturn(Optional.of(categoryReadDto1)).when(categoryService).findById(Mockito.anyInt());
         MockHttpServletRequestBuilder requestBuilder = MockMvcRequestBuilders.get("/api/v1/manufacturers/models/years/categories/1")
                 .accept(MediaType.APPLICATION_JSON);
-        MvcResult result = mockMvc.perform(requestBuilder).andReturn();
+        MvcResult result = mockMvc.perform(requestBuilder)
+                .andExpect(MockMvcResultMatchers.status().isOk())
+                .andReturn();
         String expected = "{\"id\":1,\"name\":\"category1\"}";
         JSONAssert.assertEquals(expected, result.getResponse().getContentAsString(), false);
     }
@@ -76,9 +80,10 @@ class CategoryControllerTest {
                 .accept(MediaType.APPLICATION_JSON)
                 .content(categoryCreateUpdateJson)
                 .contentType(MediaType.APPLICATION_JSON);
-        MvcResult result = mockMvc.perform(requestBuilder).andReturn();
+        MvcResult result = mockMvc.perform(requestBuilder)
+                .andExpect(MockMvcResultMatchers.status().isCreated())
+                .andReturn();
         String expected = "{\"id\":1,\"name\":\"category1\"}";
-        assertEquals(HttpStatus.CREATED.value(), result.getResponse().getStatus());
         JSONAssert.assertEquals(expected, result.getResponse().getContentAsString(), false);
     }
 
@@ -90,7 +95,9 @@ class CategoryControllerTest {
                 .accept(MediaType.APPLICATION_JSON)
                 .content(categoryCreateUpdateJson)
                 .contentType(MediaType.APPLICATION_JSON);
-        MvcResult result = mockMvc.perform(requestBuilder).andReturn();
+        MvcResult result = mockMvc.perform(requestBuilder)
+                .andExpect(MockMvcResultMatchers.status().isOk())
+                .andReturn();
         String expected = "{\"id\":1,\"name\":\"category1\"}";
         JSONAssert.assertEquals(expected, result.getResponse().getContentAsString(), false);
     }
