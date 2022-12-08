@@ -4,20 +4,22 @@ import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 import org.skyscreamer.jsonassert.JSONAssert;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.autoconfigure.security.servlet.SecurityAutoConfiguration;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.boot.test.mock.mockito.SpyBean;
+import org.springframework.context.annotation.Import;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
+import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.test.web.servlet.request.MockHttpServletRequestBuilder;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 import org.springframework.validation.BindException;
+import org.vitalii.carrestservice.configurations.SecurityConfig;
 import org.vitalii.carrestservice.database.entities.CarYear;
 import org.vitalii.carrestservice.dto.*;
 import org.vitalii.carrestservice.dto.filters.CarFilter;
@@ -29,7 +31,8 @@ import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-@WebMvcTest(controllers = CarController.class, excludeAutoConfiguration = {SecurityAutoConfiguration.class})
+@WebMvcTest(controllers = CarController.class)
+@Import(SecurityConfig.class)
 class CarControllerTest {
 
     @Autowired
@@ -63,7 +66,9 @@ class CarControllerTest {
                 .findAll(Mockito.any(CarFilter.class), Mockito.any(Pageable.class));
         MockHttpServletRequestBuilder requestBuilder = MockMvcRequestBuilders.get("/api/v1/cars")
                 .accept(MediaType.APPLICATION_JSON);
-        MvcResult result = mockMvc.perform(requestBuilder).andReturn();
+        MvcResult result = mockMvc.perform(requestBuilder)
+                .andExpect(MockMvcResultMatchers.status().isOk())
+                .andReturn();
         String excepted = "{\"content\":[{\"id\":1,\"brand\":{\"id\":1,\"brand\":\"brand1\"}," +
                 "\"model\":{\"id\":1,\"model\":\"model1\"},\"year\":{\"id\":1,\"year\":\"1970\"}," +
                 "\"categories\":[{\"id\":1,\"name\":\"category1\"}]}]," +
@@ -76,7 +81,9 @@ class CarControllerTest {
         Mockito.doReturn(Optional.of(carReadDto)).when(carService).findById(Mockito.anyInt());
         MockHttpServletRequestBuilder requestBuilder = MockMvcRequestBuilders.get("/api/v1/cars/1")
                 .accept(MediaType.APPLICATION_JSON);
-        MvcResult result = mockMvc.perform(requestBuilder).andReturn();
+        MvcResult result = mockMvc.perform(requestBuilder)
+                .andExpect(MockMvcResultMatchers.status().isOk())
+                .andReturn();
         String excepted = "{\"id\":1,\"brand\":{\"id\":1,\"brand\":\"brand1\"}," +
                 "\"model\":{\"id\":1,\"model\":\"model1\"},\"year\":{\"id\":1,\"year\":\"1970\"}," +
                 "\"categories\":[{\"id\":1,\"name\":\"category1\"}]}";
@@ -84,28 +91,33 @@ class CarControllerTest {
     }
 
     @Test
+    @WithMockUser
     void createCar() throws Exception {
         Mockito.doReturn(carReadDto).when(carService).save(Mockito.any(CarCreateEditDto.class));
         MockHttpServletRequestBuilder requestBuilder = MockMvcRequestBuilders.post("/api/v1/cars")
                 .accept(MediaType.APPLICATION_JSON)
                 .content(carCreateUpdateJson)
                 .contentType(MediaType.APPLICATION_JSON);
-        MvcResult result = mockMvc.perform(requestBuilder).andReturn();
+        MvcResult result = mockMvc.perform(requestBuilder)
+                .andExpect(MockMvcResultMatchers.status().isCreated())
+                .andReturn();
         String excepted = "{\"id\":1,\"brand\":{\"id\":1,\"brand\":\"brand1\"}," +
                 "\"model\":{\"id\":1,\"model\":\"model1\"},\"year\":{\"id\":1,\"year\":\"1970\"}," +
                 "\"categories\":[{\"id\":1,\"name\":\"category1\"}]}";
-        assertEquals(HttpStatus.CREATED.value(), result.getResponse().getStatus());
         JSONAssert.assertEquals(excepted, result.getResponse().getContentAsString(), false);
     }
 
     @Test
+    @WithMockUser
     void updateCar() throws Exception {
         Mockito.doReturn(Optional.of(carReadDto)).when(carService).update(Mockito.anyInt(), Mockito.any(CarCreateEditDto.class));
         MockHttpServletRequestBuilder requestBuilder = MockMvcRequestBuilders.put("/api/v1/cars/1")
                 .accept(MediaType.APPLICATION_JSON)
                 .content(carCreateUpdateJson)
                 .contentType(MediaType.APPLICATION_JSON);
-        MvcResult result = mockMvc.perform(requestBuilder).andReturn();
+        MvcResult result = mockMvc.perform(requestBuilder)
+                .andExpect(MockMvcResultMatchers.status().isOk())
+                .andReturn();
         String excepted = "{\"id\":1,\"brand\":{\"id\":1,\"brand\":\"brand1\"}," +
                 "\"model\":{\"id\":1,\"model\":\"model1\"},\"year\":{\"id\":1,\"year\":\"1970\"}," +
                 "\"categories\":[{\"id\":1,\"name\":\"category1\"}]}";
@@ -113,6 +125,7 @@ class CarControllerTest {
     }
 
     @Test
+    @WithMockUser
     void deleteCar() throws Exception {
         Mockito.doReturn(true).when(carService).deleteById(Mockito.anyInt());
         mockMvc.perform(MockMvcRequestBuilders.delete("/api/v1/cars/1"))
@@ -120,6 +133,7 @@ class CarControllerTest {
     }
 
     @Test
+    @WithMockUser
     void createCarThrowBindException() throws Exception {
         Mockito.doReturn(Optional.of(new CarYear())).when(carYearService).findByYear(Mockito.anyString());
         mockMvc.perform(MockMvcRequestBuilders.post("/api/v1/cars")

@@ -22,6 +22,9 @@ logging:
   level:
     root: INFO
     org.vitalii.carrestservice: INFO
+    org:
+      springframework:
+        security: DEBUG
   file:
     name: carService.log
 server:

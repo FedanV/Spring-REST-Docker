@@ -19,7 +19,7 @@ import javax.validation.Valid;
 @RestController
 @RequestMapping("/api/v1/manufacturers/models/years")
 @RequiredArgsConstructor
-public class CarYearController {
+public class CarYearController implements SecuredRestController {
 
     private final CarYearService carYearService;
     private final CarYearCreateEditDtoValidator carYearCreateEditDtoValidator;

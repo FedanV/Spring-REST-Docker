@@ -1,11 +1,12 @@
 package org.vitalii.carrestservice.controllers.handlers;
 
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.mapping.PropertyReferenceException;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindException;
-import org.springframework.web.bind.MethodArgumentNotValidException;
+import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.context.request.WebRequest;
 import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler;
@@ -15,9 +16,17 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
-@RestControllerAdvice
+
 @Slf4j
+@RestControllerAdvice
 public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
+
+    @ExceptionHandler({PropertyReferenceException.class})
+    public ResponseEntity<Object> handlePropertyReferenceException(PropertyReferenceException ex) {
+        String body = String.format("Property '%s' not found", ex.getPropertyName());
+        log.error(body, ex);
+        return new ResponseEntity<>(body, HttpStatus.NOT_ACCEPTABLE);
+    }
 
     @Override
     public ResponseEntity<Object> handleBindException(BindException ex,

@@ -20,7 +20,7 @@ import javax.validation.Valid;
 @RestController
 @RequestMapping("/api/v1/manufacturers")
 @RequiredArgsConstructor
-public class CarBrandController {
+public class CarBrandController implements SecuredRestController {
 
     private final CarBrandService carBrandService;
     private final CarBrandCreateEditDtoValidator carBrandDtoValidator;
