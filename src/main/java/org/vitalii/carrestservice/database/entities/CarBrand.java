@@ -6,11 +6,9 @@ import javax.persistence.*;
 import java.util.ArrayList;
 import java.util.List;
 
+@Data
 @NoArgsConstructor
 @AllArgsConstructor
-@ToString
-@Setter
-@Getter
 @Builder
 @Entity
 @Table(name = "car_brand")
